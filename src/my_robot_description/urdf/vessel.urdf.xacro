@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<robot name="vessel" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <link name="base_footprint"/>
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="-0.032 0 0.0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://my_robot_description/meshes/vessel.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="light_black"/>
+            <!-- <material name="textured_material">
+                <texture filename="ship_hull.png"/>
+            </material> -->
+        </visual>
+    </link> <!-- Added missing closing tag for <link name="base_link"> -->
+
+    <joint name="base_joint" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="base_link"/>
+        <origin xyz="0.0 0.0 0.010" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo reference="base_link">
+        <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+</robot>

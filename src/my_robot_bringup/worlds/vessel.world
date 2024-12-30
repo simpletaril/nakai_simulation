@@ -1,0 +1,360 @@
+<sdf version='1.7'>
+  <world name='ocean_world'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <physics name='default_physics' type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <model name='ocean'>
+      <static>1</static>
+      <link name='ocean_link'>
+        <visual name='ocean_surface'>
+          <pose>0 0 0 0 -0 0</pose>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <mesh>
+              <uri>file://Media/models/sea_surface_1000m_x_1000m.dae</uri>
+              <scale>2 2 2</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/waves.material</uri>
+              <name>UUVSimulator/SimpleWaves</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='ocean_below'>
+          <pose>0 0 0 3.14 -0 0</pose>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <mesh>
+              <uri>file://Media/models/sea_surface_1000m_x_1000m.dae</uri>
+              <scale>2 2 2</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/water.material</uri>
+              <name>UUVSimulator/StaticWater</name>
+            </script>
+          </material>
+        </visual>
+        <visual name='seafloor'>
+          <cast_shadows>0</cast_shadows>
+          <pose>0 0 -100 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>2000 2000 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/sand.material</uri>
+              <name>UUVSimulator/SandAndStones</name>
+            </script>
+            <emissive>0.6 0.6 0.6 1</emissive>
+          </material>
+        </visual>
+        <collision name='seafloor_collision'>
+          <pose>0 0 -100 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>2000 2000 0.1</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='north'>
+          <pose>1000 0 -50 3.14159 -1.57079 3.14159</pose>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 2000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/water.material</uri>
+              <name>UUVSimulator/SeaWall</name>
+            </script>
+            <emissive>0.6 0.6 0.6 1</emissive>
+          </material>
+        </visual>
+        <visual name='south'>
+          <pose>-1000 0 -50 3.14159 1.57079 3.14159</pose>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 2000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/water.material</uri>
+              <name>UUVSimulator/SeaWall</name>
+            </script>
+            <emissive>0.6 0.6 0.6 1</emissive>
+          </material>
+        </visual>
+        <visual name='west'>
+          <pose>0 1000 -50 1.5708 -0 0</pose>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>2000 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/water.material</uri>
+              <name>UUVSimulator/SeaWall</name>
+            </script>
+            <emissive>0.6 0.6 0.6 1</emissive>
+          </material>
+        </visual>
+        <visual name='east'>
+          <pose>0 -1000 -50 -1.5708 0 0</pose>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>2000 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://Media/materials/scripts/water.material</uri>
+              <name>UUVSimulator/SeaWall</name>
+            </script>
+            <emissive>0.6 0.6 0.6 1</emissive>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <plugin name='buoyancy_plugin' filename='libBuoyancyPlugin.so'>
+          <fluid_density>5025</fluid_density>
+          <fluid_level>0.0</fluid_level>
+        </plugin>
+      </link>
+    </model>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <state world_name='ocean_world'>
+      <sim_time>125 565000000</sim_time>
+      <real_time>41 211876891</real_time>
+      <wall_time>1725956487 876726649</wall_time>
+      <iterations>40922</iterations>
+      <model name='ocean'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='ocean_link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='waves'>
+        <pose>44.1668 -17.6045 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose>44.1668 -17.6045 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>-33.6482 34.3851 18.2716 0 0.235643 -0.863808</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='waves'>
+      <static>1</static>
+      <plugin name='gz::sim::systems::WavesModel' filename='gz-waves1-waves-model-system'>
+        <static>0</static>
+        <update_rate>30</update_rate>
+        <wave>
+          <algorithm>fft</algorithm>
+          <tile_size>256</tile_size>
+          <cell_count>256</cell_count>
+          <wind_speed>5.0</wind_speed>
+          <wind_angle_deg>135</wind_angle_deg>
+          <steepness>2</steepness>
+        </wave>
+      </plugin>
+      <link name='base_link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>/home/roey/.gazebo/models/waves/materials/mesh_L256m_N256.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0 0.05 0.8 0.92</ambient>
+            <diffuse>0 0.1 0.7 0.92</diffuse>
+            <specular>0.7 0.7 0.7 0.92</specular>
+            <pbr>
+              <metal>
+                <albedo_map>materials/water.jpg</albedo_map>
+                <normal_map>materials/wave_normals.dds</normal_map>
+                <environment_map>materials/skybox_lowres.dds</environment_map>
+                <roughness>0.3</roughness>
+                <metalness>0.1</metalness>
+              </metal>
+            </pbr>
+          </material>
+          <plugin name='gz::sim::systems::WavesVisual' filename='gz-waves1-waves-visual-system'>
+            <static>0</static>
+            <mesh_deformation_method>DYNAMIC_GEOMETRY</mesh_deformation_method>
+            <tiles_x>-0 0</tiles_x>
+            <tiles_y>-0 0</tiles_y>
+            <wave>
+              <algorithm>fft</algorithm>
+              <tile_size>256</tile_size>
+              <cell_count>256</cell_count>
+              <wind_speed>5.0</wind_speed>
+              <wind_angle_deg>135</wind_angle_deg>
+              <steepness>2</steepness>
+            </wave>
+            <shader language='metal'>
+              <vertex>materials/waves_vs.metal</vertex>
+              <fragment>materials/waves_fs.metal</fragment>
+            </shader>
+            <param>
+              <shader>vertex</shader>
+              <name>world_matrix</name>
+            </param>
+            <param>
+              <shader>vertex</shader>
+              <name>worldviewproj_matrix</name>
+            </param>
+            <param>
+              <shader>vertex</shader>
+              <name>camera_position</name>
+            </param>
+            <param>
+              <shader>vertex</shader>
+              <name>rescale</name>
+              <value>0.5</value>
+              <type>float</type>
+            </param>
+            <param>
+              <shader>vertex</shader>
+              <name>bumpScale</name>
+              <value>128 128</value>
+              <type>float_array</type>
+            </param>
+            <param>
+              <shader>vertex</shader>
+              <name>bumpSpeed</name>
+              <value>0.01 0.01</value>
+              <type>float_array</type>
+            </param>
+            <param>
+              <shader>vertex</shader>
+              <name>t</name>
+              <value>TIME</value>
+            </param>
+            <param>
+              <shader>fragment</shader>
+              <name>deepColor</name>
+              <value>0.0 0.05 0.2 1.0</value>
+              <type>float_array</type>
+            </param>
+            <param>
+              <shader>fragment</shader>
+              <name>shallowColor</name>
+              <value>0.0 0.1 0.3 1.0</value>
+              <type>float_array</type>
+            </param>
+            <param>
+              <shader>fragment</shader>
+              <name>fresnelPower</name>
+              <value>5.0</value>
+              <type>float</type>
+            </param>
+            <param>
+              <shader>fragment</shader>
+              <name>hdrMultiplier</name>
+              <value>0.4</value>
+              <type>float</type>
+            </param>
+            <param>
+              <shader>fragment</shader>
+              <name>bumpMap</name>
+              <value>materials/wave_normals.dds</value>
+              <type>texture</type>
+              <arg>0</arg>
+            </param>
+            <param>
+              <shader>fragment</shader>
+              <name>cubeMap</name>
+              <value>materials/skybox_lowres.dds</value>
+              <type>texture_cube</type>
+              <arg>1</arg>
+            </param>
+          </plugin>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>44.1668 -17.6045 0 0 -0 0</pose>
+    </model>
+  </world>
+</sdf>

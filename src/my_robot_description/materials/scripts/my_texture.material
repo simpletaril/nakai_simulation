@@ -1,0 +1,14 @@
+material MyBox/Texture
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture texture.png
+      }
+    }
+  }
+}
+

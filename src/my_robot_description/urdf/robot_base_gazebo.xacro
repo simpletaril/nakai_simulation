@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Material assignments -->
+    <gazebo reference="base_link">
+        <material>Gazebo/Red</material>
+    </gazebo>
+
+    <gazebo reference="right_wheel_link">
+    <material>Gazebo/Grey</material>
+    <surface>
+        <friction>
+            <ode>
+                <mu>100</mu>  <!-- Static friction coefficient -->
+                <mu2>50</mu2> <!-- Dynamic friction coefficient -->
+            </ode>
+        </friction>
+    </surface>
+    </gazebo>
+
+    <gazebo reference="left_rear_wheel_link">
+        <material>Gazebo/Grey</material>
+        <surface>
+            <friction>
+                <ode>
+                    <mu>100</mu>  <!-- Static friction coefficient -->
+                    <mu2>50</mu2> <!-- Dynamic friction coefficient -->
+                </ode>
+            </friction>
+        </surface>
+    </gazebo>
+
+    <gazebo reference="left_wheel_link">
+        <material>Gazebo/Grey</material>
+        <surface>
+            <friction>
+                <ode>
+                    <mu>100</mu>  <!-- Static friction coefficient -->
+                    <mu2>50</mu2> <!-- Dynamic friction coefficient -->
+                </ode>
+            </friction>
+        </surface>
+    </gazebo>
+
+    <gazebo reference="right_rear_wheel_link">
+        <material>Gazebo/Grey</material>
+        <surface>
+            <friction>
+                <ode>
+                    <mu>100</mu>  <!-- Static friction coefficient -->
+                    <mu2>50</mu2> <!-- Dynamic friction coefficient -->
+                </ode>
+            </friction>
+        </surface>
+    </gazebo>
+
+
+
+    <!-- Differential drive plugin -->
+    <gazebo>
+      <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+
+
+        <update_rate>10.0</update_rate>
+        <num_wheel_pairs>2</num_wheel_pairs>
+
+        <right_joint>base_right_wheel_joint</right_joint>
+        <left_joint>base_left_wheel_joint</left_joint>
+
+        <right_joint>base_right_rear_wheel_joint</right_joint>
+        <left_joint>base_left_rear_wheel_joint</left_joint>
+        
+        <wheel_separation>0.445</wheel_separation>
+        <wheel_diameter>0.2</wheel_diameter>
+        
+        <wheel_separation>0.445</wheel_separation>
+        <wheel_diameter>0.2</wheel_diameter>
+
+        <max_wheel_torque>200</max_wheel_torque>
+        <max_wheel_acceleration>100.0</max_wheel_acceleration>
+
+        <max_wheel_torque>200</max_wheel_torque>
+        <max_wheel_acceleration>100.0</max_wheel_acceleration>
+
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
+        <publish_wheel_tf>false</publish_wheel_tf>
+
+        <odometry_frame>odom</odometry_frame>
+        <robot_base_frame>base_footprint</robot_base_frame>
+    </plugin>
+    </gazebo>
+    
+    <!-- Force plugins for various links -->
+    <gazebo>
+      <plugin name="force1_plugin" filename="libgazebo_ros_force.so">
+        <ros>
+          <namespace>/my_robot_namespace</namespace>
+          <remapping>gazebo_ros_force:=/apply_force</remapping>
+        </ros>
+        <link_name>right_rear_wheel_link</link_name>
+        <force_frame>world</force_frame>
+      </plugin>
+
+      <plugin name="force2_plugin" filename="libgazebo_ros_force.so">
+        <ros>
+          <namespace>/my_robot_namespace</namespace>
+          <remapping>gazebo_ros_force:=/apply_force</remapping>
+        </ros>
+        <link_name>left_wheel_link</link_name>
+        <force_frame>world</force_frame>    <!--adjust the force frame-->
+      </plugin>
+
+      <plugin name="force3_plugin" filename="libgazebo_ros_force.so">
+        <ros>
+          <namespace>/my_robot_namespace</namespace>
+          <remapping>gazebo_ros_force:=/apply_force</remapping>
+        </ros>
+        <link_name>left_rear_wheel_link</link_name>
+        <force_frame>world</force_frame>
+      </plugin>
+
+      <plugin name="force4_plugin" filename="libgazebo_ros_force.so">
+        <ros>
+          <namespace>/my_robot_namespace</namespace>
+          <remapping>gazebo_ros_force:=/apply_force</remapping>
+        </ros>
+        <link_name>right_wheel_link</link_name>
+        <force_frame>world</force_frame>
+      </plugin>
+    </gazebo>
+
+
+
+    <gazebo>
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <jointName>base_right_wheel_joint</jointName>
+            <jointName>base_left_wheel_joint</jointName>
+            <jointName>base_right_rear_wheel_joint</jointName>
+            <jointName>base_left_rear_wheel_joint</jointName>
+            <jointName>base_joint</jointName>
+            <jointName>base_imu_joint</jointName>
+        </plugin>
+    </gazebo>
+
+
+<!-- add imu plugin -->
+
+    <gazebo reference="imu_link">
+      <gravity>true</gravity>
+      <sensor name="imu" type="imu">
+        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+          <ros>
+            <remapping>~/out:=/data/imu</remapping>
+          </ros>
+          <initial_orientation_as_reference>false</initial_orientation_as_reference>
+        </plugin>
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7453293e-5</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7453293e-5</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7453293e-5</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+    </gazebo>
+
+
+
+
+
+
+
+
+        <!-- hokuyo -->
+    <gazebo reference="hokuyo_link">
+      <sensor type="ray" name="head_hokuyo_sensor">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>true</visualize>
+        <update_rate>40</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <resolution>1</resolution>
+              <min_angle>-1.0796</min_angle>
+              <max_angle>1.0796</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.10</min>
+            <max>30.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise parameters based on published spec for Hokuyo laser
+                achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+                stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+                reading. -->
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+          <topicName>/en613/scan</topicName>
+          <frameName>hokuyo_link</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+</robot>
