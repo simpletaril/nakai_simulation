@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<robot name="vessel" xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <gazebo reference="base_link">
+      <material>Gazebo/Red</material>
+  </gazebo>
+
+</robot>

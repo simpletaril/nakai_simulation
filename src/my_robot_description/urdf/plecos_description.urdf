@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<robot name="nakai_robot"
+  xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="plecos_properties.urdf"/>  
+  <xacro:include filename="plecos_components.urdf"/>  
+
+
+  
+  <xacro:macro name="ultrasound_sensor" params="prefix parent_link ultrasound_yoff:=0 ultrasound_yaw:=0 ultrasound_pitch:=0 reflect_x:=1">
+    <link name="${prefix}_link">
+      <visual>
+        <geometry>
+          <box size="${ultrasound_width} ${ultrasound_length} ${ultrasound_height}"/>
+        </geometry>
+        <material name="Grey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${ultrasound_width} ${ultrasound_length} ${ultrasound_height}"/>
+        </geometry>
+      </collision>
+      <xacro:box_inertia m="${ultrasound_mass}" w="${ultrasound_width}" l="${ultrasound_length}" h="${ultrasound_height}"/>
+    </link>
+
+    <joint name="${prefix}_joint" type="fixed">
+      <parent link="${parent_link}"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="${us_xoff * reflect_x} ${ultrasound_yoff} 0" rpy="0 ${us_pitch} ${ultrasound_yaw}"/>
+    </joint>
+
+    <gazebo reference="${prefix}_link">
+      <sensor name="${prefix}_ultrasound" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <!-- TODO upate according to setup in robot -->
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-0.08</min_angle>
+              <max_angle>0.08</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>2</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <plugin name="${prefix}_controller" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:=/range/raw</remapping>
+          </ros>
+          <radiation_type>ultrasound</radiation_type>
+          <output_type>sensor_msgs/Range</output_type>
+          <frame_name>${prefix}_link</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="cart" params="prefix mesh_file:=${None} cart_width cart_length wheel_xoff:=0 has_imu:=true imu_x_offset:=0 imu_y_offset:=0">
+    <link name="${prefix}_link">
+      <visual>
+        <geometry>
+          <xacro:if value="${mesh_file is not None}">
+            <mesh filename="file://$(find nakai_robot)${mesh_file}" />
+          </xacro:if>
+          <xacro:unless value="${mesh_file is not None}">
+            <box size="${cart_length} ${cart_width} ${cart_height}" />
+          </xacro:unless>
+        </geometry>
+        <material name="carbon_light"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <xacro:if value="${mesh_file is not None}">
+            <mesh filename="file://$(find nakai_robot)${mesh_file}" />
+          </xacro:if>
+          <xacro:unless value="${mesh_file is not None}">
+            <box size="${cart_length} ${cart_width} ${cart_height}" />
+          </xacro:unless>
+        </geometry>
+        <material name="carbon"/>
+      </collision>
+
+      <xacro:box_inertia m="${cart_mass}" w="${cart_width}" l="${cart_length}" h="${cart_height}"/>
+    </link>
+    <!-- wheels -->
+    <xacro:wheel prefix="${prefix}_wheel_r_front" parent_link="${prefix}_link" wheel_xoff="${wheel_xoff}" reflect_y="-1" />
+    <xacro:wheel prefix="${prefix}_wheel_l_front" parent_link="${prefix}_link" wheel_xoff="${wheel_xoff}" />
+    
+    <xacro:wheel prefix="${prefix}_wheel_r_back" parent_link="${prefix}_link" wheel_xoff="${-wheel_xoff}" reflect_y="-1" />
+    <xacro:wheel prefix="${prefix}_wheel_l_back" parent_link="${prefix}_link" wheel_xoff="${-wheel_xoff}" />
+    <!-- IMU -->
+    <xacro:if value="${has_imu}">
+      <xacro:imu_sensor prefix="imu" parent_link="${prefix}_link" imu_x="${imu_x_offset}" imu_y="${imu_y_offset}" />
+    </xacro:if>
+    <!-- ultrasonic sensors -->
+    <xacro:ultrasound_sensor prefix="us_f1" parent_link="${prefix}_link" ultrasound_yoff="${us_1_yoff}" ultrasound_yaw="${us_f1_yaw}" />
+    <xacro:ultrasound_sensor prefix="us_f2" parent_link="${prefix}_link" ultrasound_yoff="${us_2_yoff}" ultrasound_yaw="${us_f2_yaw}" />
+    <xacro:ultrasound_sensor prefix="us_f3" parent_link="${prefix}_link" ultrasound_yoff="${us_3_yoff}" ultrasound_yaw="${us_f3_yaw}" />
+
+    <xacro:ultrasound_sensor prefix="us_b1" parent_link="${prefix}_link" ultrasound_yoff="${us_1_yoff}" ultrasound_yaw="${us_b1_yaw}" reflect_x="-1" />
+    <xacro:ultrasound_sensor prefix="us_b2" parent_link="${prefix}_link" ultrasound_yoff="${us_2_yoff}" ultrasound_yaw="${us_b2_yaw}" reflect_x="-1" />
+    <xacro:ultrasound_sensor prefix="us_b3" parent_link="${prefix}_link" ultrasound_yoff="${us_3_yoff}" ultrasound_yaw="${us_b3_yaw}" reflect_x="-1" />
+  </xacro:macro>
+
+
+<!-- Basic links -->
+  <link name="base_footprint" />
+  <link name="base_link" />
+  
+<!-- Basic joints -->
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="base_link_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="cart_link"/>
+    <origin xyz="0.0 0.0 0.1" rpy="0 0 0"/>
+  </joint>
+<!-- cart links -->
+  <xacro:cart prefix="cart" cart_width="${cart_width}" cart_length="${cart_length}" 
+                            wheel_xoff="${wheel_xoff}" has_imu="true"
+                            imu_x_offset="${imu_x_offset}" imu_y_offset="${imu_y_offset}"/>
+  
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+        <namespace>/sim</namespace>
+      </ros>
+
+      <update_rate>10.0</update_rate>
+      <num_wheel_pairs>2</num_wheel_pairs>
+
+      <right_joint>cart_wheel_r_front_joint</right_joint>
+      <left_joint>cart_wheel_l_front_joint</left_joint>
+
+      <right_joint>cart_wheel_r_back_joint</right_joint>
+      <left_joint>cart_wheel_l_back_joint</left_joint>
+      
+      <wheel_separation>${_wheel_separation}</wheel_separation>
+      <wheel_diameter>${wheel_radius * 2}</wheel_diameter>
+      
+      <wheel_separation>${_wheel_separation}</wheel_separation>
+      <wheel_diameter>${wheel_radius * 2}</wheel_diameter>
+
+      <!-- <max_wheel_torque>200</max_wheel_torque>
+      <max_wheel_acceleration>100.0</max_wheel_acceleration>
+
+      <max_wheel_torque>200</max_wheel_torque>
+      <max_wheel_acceleration>100.0</max_wheel_acceleration> -->
+
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>false</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+    </plugin>
+  </gazebo>
+
+
+  <gazebo>
+    <plugin name="force1_plugin" filename="libgazebo_ros_force.so">
+      <ros>
+        <remapping>gazebo_ros_force:=/apply_force</remapping>
+      </ros>
+      <link_name>cart_wheel_l_back_link</link_name>
+      <force_frame>world</force_frame>
+    </plugin>
+  </gazebo>
+
+
+  <gazebo>
+    <plugin name="force2_plugin" filename="libgazebo_ros_force.so">
+      <ros>
+        
+        <remapping>gazebo_ros_force:=/apply_force</remapping>
+      </ros>
+      <link_name>cart_wheel_r_back_link</link_name>
+      <force_frame>world</force_frame>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="force3_plugin" filename="libgazebo_ros_force.so">
+      <ros>
+  
+        <remapping>gazebo_ros_force:=/apply_force</remapping>
+      </ros>
+      <link_name>cart_wheel_l_front_link</link_name>
+      <force_frame>world</force_frame>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="force4_plugin" filename="libgazebo_ros_force.so">
+      <ros>
+       
+        <remapping>gazebo_ros_force:=/apply_force</remapping>
+      </ros>
+      <link_name>cart_wheel_r_front_link</link_name>
+      <force_frame>world</force_frame>
+    </plugin>
+  </gazebo>
+
+  
+
+</robot>

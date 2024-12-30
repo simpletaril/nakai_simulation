@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="sensor_length" value="0.01" />
+    <xacro:property name="sensor_width" value="0.1" />
+    <xacro:property name="sensor_height" value="0.05" />
+
+    <link name="sensor1_link">
+        <visual>
+            <geometry>
+                <box size="${sensor_length} ${sensor_width} ${sensor_height}" />
+            </geometry>
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${sensor_length} ${sensor_width} ${sensor_height}" />
+            </geometry>
+        </collision>
+        <xacro:box_inertia m="0.1" l="${sensor_length}" w="${sensor_width}" h="${sensor_height}"
+                           xyz="0 0 0" rpy="0 0 0" />
+    </link>
+
+    <joint name="base_sensor_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="sensor1_link" />
+        <origin xyz="${(base_length + sensor_length) / 2.0} 0.07 ${(base_height / 2.0) + 0.5 }" rpy="${pi/2} 0 0.1" />
+    </joint>
+
+
+
+
+
+    <link name="sensor2_link">
+        <visual>
+            <geometry>
+                <box size="${sensor_length} ${sensor_width} ${sensor_height}" />
+            </geometry>
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${sensor_length} ${sensor_width} ${sensor_height}" />
+            </geometry>
+        </collision>
+        <xacro:box_inertia m="0.1" l="${sensor_length}" w="${sensor_width}" h="${sensor_height}"
+                           xyz="0 0 0" rpy="0 0 0" />
+    </link>
+
+    <joint name="base_sensor2_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="sensor2_link" />
+        <origin xyz="${(base_length + sensor_length) / 2.0} 0.07 ${(base_height / 2.0) + 0.37 }" rpy="${pi/2} 0.35 0.1" />
+    </joint>
+
+
+
+
+    <link name="sensor3_link">
+        <visual>
+            <geometry>
+                <box size="${sensor_length} ${sensor_width} ${sensor_height}" />
+            </geometry>
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${sensor_length} ${sensor_width} ${sensor_height}" />
+            </geometry>
+        </collision>
+        <xacro:box_inertia m="0.1" l="${sensor_length}" w="${sensor_width}" h="${sensor_height}"
+                           xyz="0 0 0" rpy="0 0 0" />
+    </link>
+
+    <joint name="base_sensor3_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="sensor3_link" />
+        <origin xyz="${(base_length + sensor_length) / 2.0} 0.07 ${(base_height / 2.0) + 0.63 }" rpy="${pi/2} -0.35 0.1" />
+    </joint>
+
+
+    <gazebo reference="sensor1_link">
+      <sensor name="sensor_ultrasound1" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <!-- TODO upate according to setup in robot -->
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-0.08</min_angle>
+              <max_angle>0.08</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>2</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <plugin name="sensor_controller1" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:=/range/raw</remapping>
+          </ros>
+          <radiation_type>ultrasound</radiation_type>
+          <output_type>sensor_msgs/Range</output_type>
+          <frame_name>base_link</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+
+    <gazebo reference="sensor2_link">
+      <sensor name="sensor_ultrasound2" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <!-- TODO upate according to setup in robot -->
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-0.08</min_angle>
+              <max_angle>0.08</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>2</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <plugin name="sensor_controller2" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:=/range/raw</remapping>
+          </ros>
+          <radiation_type>ultrasound</radiation_type>
+          <output_type>sensor_msgs/Range</output_type>
+          <frame_name>base_link</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+
+
+    <gazebo reference="sensor3_link">
+      <sensor name="sensor_ultrasound3" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <!-- TODO upate according to setup in robot -->
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-0.08</min_angle>
+              <max_angle>0.08</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>2</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+        <plugin name="sensor_controller3" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:=/range/raw</remapping>
+          </ros>
+          <radiation_type>ultrasound</radiation_type>
+          <output_type>sensor_msgs/Range</output_type>
+          <frame_name>base_link</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+</robot>
